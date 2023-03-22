@@ -6,11 +6,18 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Leitor de QRCode</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+  </style>
 </head>
 
-<body>
+<body style="display: flex; align-items: center; justify-content: center; height: 100vh; width: 100vw; padding: 5px">
   <button id="start-camera">Iniciar câmera</button>
-  <video id="preview" playsinline style="display:none;"></video>
+  <video id="preview" playsinline style="display: none;align-items: center;justify-content: center; width: 100%;"></video>
   <canvas id="canvas" style="display:none;"></canvas>
 
   <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
@@ -21,11 +28,11 @@
     const context = canvas.getContext('2d', { willReadFrequently: true });
 
     startCameraButton.addEventListener('click', () => {
-      navigator.mediaDevices.getUserMedia({ video: true })
+      navigator.mediaDevices.getUserMedia({ video: true, facingMode: { exact: "environment" } })
         .then((stream) => {
           video.srcObject = stream;
           video.setAttribute('playsinline', true);
-          video.style.display = 'block';
+          video.style.display = 'flex';
           startCameraButton.style.display = 'none';
           video.play();
           requestAnimationFrame(tick);
@@ -38,12 +45,16 @@
       const code = jsQR(imageData.data, imageData.width, imageData.height);
 
       if (code) {
-        context.strokeStyle = '#FF0000'; // Define a cor da borda
+        context.strokeStyle = 'red'; // Define a cor da borda
         context.lineWidth = 5; // Define a largura da borda
-        context.strokeRect(code.location.topLeftCorner.x, code.location.topLeftCorner.y,
+        context.strokeRect(
+          code.location.topLeftCorner.x,
+          code.location.topLeftCorner.y,
           code.location.bottomRightCorner.x - code.location.topLeftCorner.x,
-          code.location.bottomRightCorner.y - code.location.topLeftCorner.y); // Desenha o retângulo envolta do QR code
-        alert(code);
+          code.location.bottomRightCorner.y - code.location.topLeftCorner.y
+        );
+
+        alert(code['data'])
       }
       requestAnimationFrame(tick);
     }
